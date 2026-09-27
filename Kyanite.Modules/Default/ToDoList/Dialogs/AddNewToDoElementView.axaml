@@ -20,16 +20,18 @@
                         ClockIdentifier="24HourClock"
                         HorizontalAlignment="Stretch"
                         Margin="6,0,0,0"/>
-
-            <!--TBA <ComboBox Grid.Column="1"
-                      ItemsSource="{Binding AvailablePriorities}"
-                      SelectedItem="{Binding Priority}"
-                      HorizontalAlignment="Stretch"
-                      Margin="6,0,0,0"/>
-            -->
         </Grid>
-
-        <TextBox PlaceholderText="Tags (comma-separated, e.g. Work, Home)..."
-                 Text="{Binding TagsInput}"/>
+        <Grid ColumnDefinitions="*,*">
+            <ComboBox Grid.Column="1"
+                    PlaceholderText="Priority"
+                    ItemsSource="{Binding AvailablePriorities}"
+                    SelectedItem="{Binding Priority}"
+                    HorizontalAlignment="Stretch"
+                    Margin="6,0,0,0"/>
+            
+            <TextBox Grid.Column="0"    
+                    PlaceholderText="Tags (comma-separated, e.g. Work, Home)..."
+                    Text="{Binding TagsInput}"/>
+        </Grid>
     </StackPanel>
 </UserControl>
