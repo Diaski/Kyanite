@@ -97,14 +97,12 @@ internal partial class ToDoListViewModel : Module
     [RelayCommand]
     void OpenAddNewDialog()
     {
-        var dialog = new DialogBuilder()
-            .WithTitle("Add new Taks todo")
-            .WithSize(1050, 200)
+        dialogService.CreateBuilder()
+            .WithTitle("Add new ToDo element")
+            .WithSize(1067, 200)
             .WithViewModel(new AddNewToDoElementViewModel())
-            .SetOnClose(OnAddDialogClosed)
-            .Build();
-
-        _dialogService.Show(dialog);
+            .AddButton("Close", OnAddDialogClosed)
+            .BuildAndShow();
     }
 
     [RelayCommand]
