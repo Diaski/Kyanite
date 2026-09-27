@@ -62,20 +62,18 @@ internal partial class ToDoListViewModel : Module
     /* This should work when you change .net version to proper one */
     void ShowNotification(string title, string message)
     {
-        _notificationServiceProvider.ActiveService.Show(title, message);
+        _notificationServiceProvider.ActiveService?.Show(title, message);
     }
 
     [RelayCommand]
     void OpenSettingsDialog()
     {
-        var dialog = new DialogBuilder()
+        _dialogService.CreateBuilder()
             .WithTitle("To-Do Settings")
             .WithSize(420, 260)
             .WithViewModel(new ToDoSettingsViewModel(Settings))
-            .SetOnClose(OnSettingsDialogClosed)
-            .Build();
-
-        _dialogService.Show(dialog);
+            .AddButton("Add", OnSettingsDialogClosed)
+            .BuildAndShow();
     }
 
     void OnSettingsDialogClosed(Dialog dialog)
@@ -97,7 +95,7 @@ internal partial class ToDoListViewModel : Module
     [RelayCommand]
     void OpenAddNewDialog()
     {
-        dialogService.CreateBuilder()
+        _dialogService.CreateBuilder()
             .WithTitle("Add new ToDo element")
             .WithSize(1067, 200)
             .WithViewModel(new AddNewToDoElementViewModel())
