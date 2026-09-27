@@ -72,8 +72,10 @@ internal partial class AppViewModel(IServiceProvider serviceProvider) : ViewMode
             await moduleManager.SaveModule(mainViewModel.SelectedModule);
         }
 
-        DatabaseStack databaseStack = serviceProvider.GetRequiredService<DatabaseStack>();
-        await databaseStack.OnWindowClosing();
+        DatabaseStackProvider databaseStackProvider = serviceProvider.GetRequiredService<DatabaseStackProvider>();
+        
+        if(databaseStackProvider.ActiveStack is not null)
+            await databaseStackProvider.ActiveStack.OnWindowClosing();
 
         if (Application.Current!.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.Shutdown();
