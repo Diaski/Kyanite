@@ -59,11 +59,6 @@ internal partial class ToDoListViewModel : Module
         };
     }
 
-    /* This should work when you change .net version to proper one */
-    void ShowNotification(string title, string message)
-    {
-        _notificationServiceProvider.ActiveService?.Show(title, message);
-    }
 
     [RelayCommand]
     void OpenSettingsDialog()
@@ -74,15 +69,6 @@ internal partial class ToDoListViewModel : Module
             .WithViewModel(new ToDoSettingsViewModel(Settings))
             .AddButton("Add", OnSettingsDialogClosed)
             .BuildAndShow();
-    }
-
-    void OnSettingsDialogClosed(Dialog dialog)
-    {
-        if (dialog.ViewModel is not ToDoSettingsViewModel vm)
-            return;
-        Settings.EnableNotifications = vm.EnableNotifications;
-        Settings.NotifyOnOverdue = vm.NotifyOnOverdue;
-        Settings.DueSoonThresholdMinutes = vm.DueSoonThresholdMinutes;
     }
 
     [RelayCommand]
@@ -116,22 +102,34 @@ internal partial class ToDoListViewModel : Module
         ToDoElements.Remove(element);
     }
 
+    /* This should work when you change .net version to proper one */
+    void ShowNotification(string title, string message)
+    {
+        _notificationServiceProvider.ActiveService?.Show(title, message);
+    }
+
+    void OnSettingsDialogClosed(Dialog dialog)
+    {
+        if (dialog.ViewModel is not ToDoSettingsViewModel vm)
+            return;
+        Settings.EnableNotifications = vm.EnableNotifications;
+        Settings.NotifyOnOverdue = vm.NotifyOnOverdue;
+        Settings.DueSoonThresholdMinutes = vm.DueSoonThresholdMinutes;
+    }
+
     void OnAddDialogClosed(Dialog dialog)
     {
         if (dialog.ViewModel is not AddNewToDoElementViewModel vm ||
             string.IsNullOrWhiteSpace(vm.ToDoElementName))
             return;
 
-        var dueDate = vm.DueDate;
-        var dueTime = vm.DueTime;
-
-        if (dueDate == null) dueDate = DateTime.Today + TimeSpan.FromHours(24);
-        if (dueTime == null) dueTime = TimeSpan.Zero;
+        var dueDate = vm.DueDate ?? DateTime.Today + TimeSpan.FromHours(24);
+        var dueTime = vm.DueTime ?? TimeSpan.Zero;
 
         ToDoElements.Insert(0, new ToDoElement
         {
             Name = vm.ToDoElementName.Trim(),
-            DueDate = dueDate.Value.Date + dueTime.Value,
+            DueDate = dueDate.Date + dueTime,
             CreatedAt = DateTime.Now
         });
 
