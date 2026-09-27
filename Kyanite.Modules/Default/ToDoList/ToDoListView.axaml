@@ -41,8 +41,22 @@
 
     <ScrollViewer>
         <StackPanel Margin="10" Grid.IsSharedSizeScope="True">
-            <Button Content="Create new element"
-                    Command="{Binding OpenAddNewDialogCommand}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Content="Create new element"
+                        Command="{Binding OpenAddNewDialogCommand}"/>
+                <Button Grid.Column="1" 
+                        Content="Settings" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Right"
+                        Command="{Binding OpenSettingsDialogCommand}"/>
+            </Grid>
 
             <TextBlock Text="TODO:" FontWeight="Bold" Margin="0,10,0,10" />
 
@@ -84,7 +98,7 @@
                                 <Button Grid.Column="0"
                                           Classes="pinBtn"
                                           Classes.pinned="{Binding IsPinned}"
-                                          Content="📌"
+                                          Content="⭐"
                                           VerticalAlignment="Center"
                                           Margin="0,0,4,0"
                                           Command="{Binding #RootView.DataContext.TogglePinCommand}"

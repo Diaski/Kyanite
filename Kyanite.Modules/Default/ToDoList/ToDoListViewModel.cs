@@ -14,6 +14,9 @@ internal partial class ToDoListViewModel : Module
     readonly NotificationServiceProvider _notificationServiceProvider;
     readonly DispatcherTimer _overdueCheckTimer;
 
+    [Synchronize] ToDoSettings _settings = new();
+    public ToDoSettings Settings => _settings;
+
     [Synchronize] ObservableCollection<ToDoElement> _toDoElements = new();
     public ObservableCollection<ToDoElement> ToDoElements => _toDoElements;
 
@@ -37,31 +40,52 @@ internal partial class ToDoListViewModel : Module
             {
                 element.RefreshOverdueStatus();
 
-                if (element.IsCompleted || element.DueDate is null)
+                if (!Settings.EnableNotifications || element.IsCompleted || element.DueDate is null)
                     continue;
 
-                var remaining = element.DueDate.Value - DateTime.Now;
-
-                /*if (!element.DueSoonNotified && remaining > TimeSpan.Zero && remaining <= TimeSpan.FromMinutes(15))
-                {
-                    ShowNotification("Reminder", $"\"{element.Name}\" is due in 15 minutes.");
-                    element.DueSoonNotified = true;
-                }
-
-                if (!element.OverdueNotified && remaining <= TimeSpan.Zero)
+                if (Settings.NotifyOnOverdue && !element.OverdueNotified && element.IsOverdue)
                 {
                     ShowNotification("Overdue", $"\"{element.Name}\" is overdue.");
                     element.OverdueNotified = true;
-                }*/
+                    element.DueSoonNotified = true; // Prevent due soon notification after overdue notification
+                }
+
+                if (!element.DueSoonNotified && element.IsDueSoon(Settings.DueSoonThresholdMinutes))
+                {
+                    ShowNotification("Reminder", $"\"{element.Name}\" is due in {Settings.DueSoonThresholdMinutes} minutes.");
+                    element.DueSoonNotified = true;
+                }
             }
         };
     }
 
-    /* This should work but idk why it doesnt show popup maybe some api stuff that i preffer not get into right now you can check it 
+    /* This should work when you change .net version to proper one */
     void ShowNotification(string title, string message)
     {
         _notificationServiceProvider.ActiveService.Show(title, message);
-    }*/
+    }
+
+    [RelayCommand]
+    void OpenSettingsDialog()
+    {
+        var dialog = new DialogBuilder()
+            .WithTitle("To-Do Settings")
+            .WithSize(420, 260)
+            .WithViewModel(new ToDoSettingsViewModel(Settings))
+            .SetOnClose(OnSettingsDialogClosed)
+            .Build();
+
+        _dialogService.Show(dialog);
+    }
+
+    void OnSettingsDialogClosed(Dialog dialog)
+    {
+        if (dialog.ViewModel is not ToDoSettingsViewModel vm)
+            return;
+        Settings.EnableNotifications = vm.EnableNotifications;
+        Settings.NotifyOnOverdue = vm.NotifyOnOverdue;
+        Settings.DueSoonThresholdMinutes = vm.DueSoonThresholdMinutes;
+    }
 
     [RelayCommand]
     void ToggleComplete(ToDoElement element)

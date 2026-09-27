@@ -21,7 +21,7 @@
                         HorizontalAlignment="Stretch"
                         Margin="6,0,0,0"/>
 
-            <!-- <ComboBox Grid.Column="1"
+            <!--TBA <ComboBox Grid.Column="1"
                       ItemsSource="{Binding AvailablePriorities}"
                       SelectedItem="{Binding Priority}"
                       HorizontalAlignment="Stretch"

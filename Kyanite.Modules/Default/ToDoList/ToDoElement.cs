@@ -30,6 +30,16 @@ internal partial class ToDoElement : ObservableObject
     public bool IsOverdue => !IsCompleted
                          && DueDate.HasValue
                          && DueDate.Value < DateTime.Now;
-
     public void RefreshOverdueStatus() => OnPropertyChanged(nameof(IsOverdue));
+
+    public bool IsDueSoon(int thresholdMinutes)
+    {
+        if (IsCompleted || !DueDate.HasValue)
+            return false;
+
+        DateTime now = DateTime.Now;
+        DateTime thresholdTime = DueDate.Value.AddMinutes(-thresholdMinutes);
+
+        return now >= thresholdTime && now < DueDate.Value;
+    }
 }

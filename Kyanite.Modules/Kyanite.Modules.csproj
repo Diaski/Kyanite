@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Kyanite.Database\Kyanite.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Default\ToDoList\Dialogs\ToDoSettingsView.axaml.cs">
+      <DependentUpon>ToDoSettingsView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>
