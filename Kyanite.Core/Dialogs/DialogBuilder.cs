@@ -6,8 +6,6 @@ public class DialogBuilder(IDialogService dialogService)
 {
     readonly IDialogService _dialogService = dialogService;
 
-    bool _deafaultButton = true;
-
     string title = "Dialog";
     int width = 300, height = 200;
 
