@@ -49,7 +49,6 @@ internal partial class ToDoListViewModel : Module, IDisposable
             .WithTitle("To-Do Settings")
             .WithSize(600, 350)
             .WithViewModel(new ToDoSettingsViewModel(_dialogService, Settings, OnSettingsSaved))
-            .DisableDefaultButton()
             .BuildAndShow();
     }
 
@@ -63,7 +62,6 @@ internal partial class ToDoListViewModel : Module, IDisposable
             .WithTitle("Add new ToDo element")
             .WithSize(1050, 350)
             .WithViewModel(new AddNewToDoElementViewModel(_dialogService, OnAddNewElement))
-            .DisableDefaultButton()
             .BuildAndShow();
     }
 
