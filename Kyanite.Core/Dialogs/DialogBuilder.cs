@@ -1,5 +1,4 @@
-﻿
-using Kyanite.ViewModels;
+﻿using Kyanite.ViewModels;
 
 namespace Kyanite.Core.Dialogs;
 
@@ -7,12 +6,14 @@ public class DialogBuilder(IDialogService dialogService)
 {
     readonly IDialogService _dialogService = dialogService;
 
+    bool _deafaultButton = true;
+
     string title = "Dialog";
     int width = 300, height = 200;
 
     ViewModelBase? viewModel;
 
-    List<RawButtonInfo> buttons = [];
+    readonly List<RawButtonInfo> buttons = [];
 
     public DialogBuilder WithTitle(string title)
     {
@@ -44,6 +45,12 @@ public class DialogBuilder(IDialogService dialogService)
         return this;
     }
 
+    public DialogBuilder DisableDefaultButton()
+    {
+        _deafaultButton = false;
+        return this;
+    }
+
     public Dialog Build()
     {
         if (viewModel is null)
@@ -51,8 +58,7 @@ public class DialogBuilder(IDialogService dialogService)
 
         var dialog = new Dialog(title, width, height, viewModel);
 
-
-        if (buttons.Count == 0)
+        if (buttons.Count == 0 && _deafaultButton)
         {
             dialog.Buttons = [
                 new ButtonInfo(){
@@ -62,7 +68,7 @@ public class DialogBuilder(IDialogService dialogService)
             ];
         }
         else
-            dialog.Buttons = buttons.Select(x => new ButtonInfo()
+            dialog.Buttons = [.. buttons.Select(x => new ButtonInfo()
             {
                 Content = x.Content,
                 Command = () =>
@@ -72,7 +78,7 @@ public class DialogBuilder(IDialogService dialogService)
                     if (x.AutoClose)
                         _dialogService.Close();
                 }
-            }).ToArray();
+            })];
 
         return dialog;
     }
