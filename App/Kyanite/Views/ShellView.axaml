@@ -22,20 +22,22 @@
                        
                        Width="{Binding DialogService.CurrentDialog.Width}" 
                        Height="{Binding DialogService.CurrentDialog.Height}" >
-               
-                <StackPanel DockPanel.Dock="Bottom" 
-                            HorizontalAlignment="Center" 
-                            Orientation="Horizontal">
 
-                    <ItemsControl ItemsSource="{Binding DialogService.CurrentDialog.Buttons}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding Command}" 
-                                        Content="{Binding Content}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                <ItemsControl DockPanel.Dock="Bottom" 
+                              HorizontalAlignment="Center" 
+                              ItemsSource="{Binding DialogService.CurrentDialog.Buttons}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding Command}" 
+                                    Content="{Binding Content}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <ContentControl Content="{Binding DialogService.CurrentDialog.ViewModel}" >
 			        <ContentControl.DataTemplates>        

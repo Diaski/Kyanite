@@ -145,6 +145,7 @@ internal partial class MainViewModel : ViewModelBase
         {
             _dialogService.CreateBuilder()
                 .WithViewModel(new ErrorInformationViewModel(ex.Message))
+                .AddCloseButton()
                 .BuildAndShow();
         }
     }
