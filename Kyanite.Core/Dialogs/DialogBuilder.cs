@@ -44,6 +44,17 @@ public class DialogBuilder(IDialogService dialogService)
         return this;
     }
 
+    public DialogBuilder AddCloseButton(string content = "Close")
+    {
+        buttons.Add(new RawButtonInfo()
+        {
+            Content = content,
+            Command = (d) => { },
+            AutoClose = true
+        });
+        return this;
+    }
+
     public Dialog Build()
     {
         if (viewModel is null)
@@ -51,28 +62,17 @@ public class DialogBuilder(IDialogService dialogService)
 
         var dialog = new Dialog(title, width, height, viewModel);
 
-
-        if (buttons.Count == 0)
+        dialog.Buttons = buttons.Select(x => new ButtonInfo()
         {
-            dialog.Buttons = [
-                new ButtonInfo(){
-                    Command = _dialogService.Close,
-                    Content = "Close"
-                }
-            ];
-        }
-        else
-            dialog.Buttons = buttons.Select(x => new ButtonInfo()
+            Content = x.Content,
+            Command = () =>
             {
-                Content = x.Content,
-                Command = () =>
-                {
-                    x.Command(dialog);
+                x.Command(dialog);
 
-                    if (x.AutoClose)
-                        _dialogService.Close();
-                }
-            }).ToArray();
+                if (x.AutoClose)
+                    _dialogService.Close();
+            }
+        }).ToArray();
 
         return dialog;
     }
