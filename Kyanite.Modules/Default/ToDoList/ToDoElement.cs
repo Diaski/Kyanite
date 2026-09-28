@@ -41,15 +41,6 @@ internal partial class ToDoElement : ObservableObject
     public bool DueSoonNotified { get; set; }
     public bool OverdueNotified { get; set; }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsOverdue))]
-    DateTime? _dueDate;
-
-    [ObservableProperty] DateTime _createdAt;
-
-    public bool DueSoonNotified { get; set; }
-    public bool OverdueNotified { get; set; }
-
     public DateTime DisplayDate => CompletedAt ?? CreatedAt;
 
     public bool IsOverdue => !IsCompleted
