@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Kyanite.Database;
-using Kyanite.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,8 @@ internal partial class PickDatabaseStackViewModel : ViewModelBase
     readonly DatabaseStackLoader _databaseStackLoader;
     readonly IServiceProvider _serviceProvider;
 
-    public string[] AvailableStacks => [.. loadedDatabaseStacks.Select(x => x.FriendlyName)];
+    public IReadOnlyList<string> AvailableStacks => loadedDatabaseStacks.Select(stack => stack.FriendlyName).ToArray();
+
     [ObservableProperty] string _pickedDatabaseStack = string.Empty;
 
     DatabaseStack[] loadedDatabaseStacks = [];
@@ -32,13 +32,27 @@ internal partial class PickDatabaseStackViewModel : ViewModelBase
 
         foreach (var stackNameAndType in _databaseStackLoader.DatabaseStackTypes)
         {
-            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, stackNameAndType.Value) ?? throw new MissingParameterlessConstructorException();
-            stacks.Add((DatabaseStack)instance);
+            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, stackNameAndType.Value);
+
+            if (instance is not DatabaseStack stack)
+                throw new InvalidOperationException($"Could not create database stack '{stackNameAndType.Key}'.");
+
+            stacks.Add(stack);
         }
 
         loadedDatabaseStacks = [.. stacks];
+
+        if (loadedDatabaseStacks.Length > 0 && string.IsNullOrEmpty(PickedDatabaseStack))
+            PickedDatabaseStack = loadedDatabaseStacks[0].FriendlyName;
     }
 
     public DatabaseStack GetPickedStack()
-        => loadedDatabaseStacks.Single(x => x.FriendlyName == PickedDatabaseStack);
+    {
+        var stack = loadedDatabaseStacks.SingleOrDefault(candidate => candidate.FriendlyName == PickedDatabaseStack);
+
+        if (stack is null)
+            throw new InvalidOperationException("Pick a valid database stack first.");
+
+        return stack;
+    }
 }
