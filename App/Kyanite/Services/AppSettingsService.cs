@@ -43,13 +43,9 @@ internal class AppSettingsService
             string json = File.ReadAllText(FullPathToSettingsFile);
             CurrentAppSettings = JsonSerializer.Deserialize<AppSettings>(json, SerializerOptions) ?? new AppSettings();
         }
-        catch (JsonException)
+        catch (Exception)
         {
             // Keep the old file for debugging and start from a clean configuration.
-            CurrentAppSettings = new AppSettings();
-        }
-        catch (IOException)
-        {
             CurrentAppSettings = new AppSettings();
         }
     }
@@ -59,6 +55,8 @@ internal class AppSettingsService
         Directory.CreateDirectory(AppDataDirectory);
 
         string json = JsonSerializer.Serialize(appSettings, SerializerOptions);
+
+        // Write to a temporary file first so a crash mid-save cannot corrupt the existing settings.
         string temporaryFile = FullPathToSettingsFile + ".tmp";
 
         File.WriteAllText(temporaryFile, json);

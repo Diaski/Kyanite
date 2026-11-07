@@ -32,10 +32,12 @@ internal partial class PickDatabaseStackViewModel : ViewModelBase
 
         foreach (var stackNameAndType in _databaseStackLoader.DatabaseStackTypes)
         {
-            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, stackNameAndType.Value)
-                ?? throw new InvalidOperationException($"Could not create database stack '{stackNameAndType.Key}'.");
+            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, stackNameAndType.Value);
 
-            stacks.Add((DatabaseStack)instance);
+            if (instance is not DatabaseStack stack)
+                throw new InvalidOperationException($"Could not create database stack '{stackNameAndType.Key}'.");
+
+            stacks.Add(stack);
         }
 
         loadedDatabaseStacks = [.. stacks];
@@ -45,6 +47,12 @@ internal partial class PickDatabaseStackViewModel : ViewModelBase
     }
 
     public DatabaseStack GetPickedStack()
-        => loadedDatabaseStacks.SingleOrDefault(stack => stack.FriendlyName == PickedDatabaseStack)
-           ?? throw new InvalidOperationException("Pick a valid database stack first.");
+    {
+        var stack = loadedDatabaseStacks.SingleOrDefault(candidate => candidate.FriendlyName == PickedDatabaseStack);
+
+        if (stack is null)
+            throw new InvalidOperationException("Pick a valid database stack first.");
+
+        return stack;
+    }
 }
